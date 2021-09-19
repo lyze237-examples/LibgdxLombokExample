@@ -27,12 +27,17 @@ gwt {
 //	compiler.style = org.wisepersist.gradle.plugins.gwt.Style.DETAILED
 }
 
+configurations { lom }
+
 dependencies {
 	implementation project(':core')
 	implementation "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
 	implementation "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
 
+	lom "org.projectlombok:lombok:$lombok"
+	implementation configurations.lom.dependencies
+	annotationProcessor "org.projectlombok:lombok:$lombok"
 //// You can use the lines below instead of the "com.badlogicgames.gdx:gdx-backend-gwt" dependencies.
 //// If you do, follow the steps at https://github.com/tommyettinger/gdx-backends#gwt-290-support
 //// and you can use GWT 2.9.0, which gives you access to Java 11 language features.
@@ -118,6 +123,24 @@ task addSource {
 	doLast {
 		sourceSets.main.compileClasspath += files(project(':core').sourceSets.main.allJava.srcDirs)
 		
+	}
+}
+
+draftCompileGwt {
+	doFirst {
+		jvmArgs "-javaagent:${configurations.lom.asPath}=ECJ"
+	}
+}
+
+compileGwt {
+	doFirst {
+		jvmArgs "-javaagent:${configurations.lom.asPath}=ECJ"
+	}
+}
+
+superDev {
+	doFirst {
+		jvmArgs "-javaagent:${configurations.lom.asPath}=ECJ"
 	}
 }
 
